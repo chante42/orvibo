@@ -1,0 +1,11 @@
+------------------------------
+-    20150823
+------------------------------
+* Creation du depot  a partir du code de Grayada/index.js (https://gist.github.com/Grayda/b2ba0aa9e70fada5018e)
+et de la librairie ninja-allone (https://github.com/Grayda/ninja-allone)
+
+* LE script une fois lancer appuyer sur le bouton pour aprendre un code et rappuyer pour le reemettre
+-> BUG l'evenement butonnpressed est envoyé a l'appuie et au relacher du bouton
+  donc le code est envoyer 2 fois, s'il sagit tu bouton allumer, le perif va s'allumer et s'eteindre.......
+  
+
