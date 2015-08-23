@@ -5,7 +5,12 @@
 et de la librairie ninja-allone (https://github.com/Grayda/ninja-allone)
 
 * LE script une fois lancer appuyer sur le bouton pour aprendre un code et rappuyer pour le reemettre
--> BUG l'evenement butonnpressed est envoyé a l'appuie et au relacher du bouton
+-> BUG  20150823-1 l'evenement butonnpressed est envoyé a l'appuie et au relacher du bouton
   donc le code est envoyer 2 fois, s'il sagit tu bouton allumer, le perif va s'allumer et s'eteindre.......
   
+* CORRECTION 20150823-1
+   Le code envoyé par le allone est le même pour button down et up.
+   ->Mise en place dans la lib une varaiable a état 
+   -> Creation d'un evenement buttonPressedUp et buttonPressDown
+   
 

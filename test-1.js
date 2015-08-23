@@ -19,8 +19,8 @@ o.on('allonefound', function() {
 // In this example, pressing the button puts the AllOne into learning mode.
 // When this code is executed, the OrviboAllOne file reports back and says WHICH AllOne has had the button pressed
 // So you can have as many AllOnes as you like, and control them individually
-o.on('buttonpress', function(index) {
-	console.log("OCH --->reçu buttonpres");
+o.on('buttonpressDown', function(index) {
+	console.log("OCH --->reçu buttonPressDown");
 	if ( etat == 0) {
     	o.enterLearningMode(index);
     }
@@ -29,6 +29,17 @@ o.on('buttonpress', function(index) {
     	o.emitIR(index, myMessage);
     }
     etat = etat+1;
+});
+
+//
+o.on('buttonpressUp', function(index) {
+  console.log("OCH --->reçu buttonPressUp ^^^^^^^^^^^^^^");
+ }); 
+
+//
+o.on('buttonpress', function(index) {
+  console.log("OCH --->reçu buttonPress    -------------");
+  
 });
 
 // This code is run when we've asked our code to subscribe to an AllOne so we can control it, and 

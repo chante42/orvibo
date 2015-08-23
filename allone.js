@@ -47,7 +47,7 @@ var hosts = []; // The array that will hold all of our disocvered sockets
 var port = 10000 // The port we'll connect on
 var payload = []; // The data we'll be sending
 var twenties = ['0x20', '0x20', '0x20', '0x20', '0x20', '0x20']; // this appears at the end of a few packets we send, so put it here for shortness of code. It's padding for the MAC address, mostly
-
+var buttonState=1;  // state of button (up or down)
 var e = new EventEmitter(); // For emitting events such as "power changed" etc.
 
 util.inherits(OrviboAllOne, EventEmitter); // We want to get all the benefits of EventEmitter, but in our own class. this means we can use this.emit("Derp");
@@ -277,6 +277,7 @@ OrviboAllOne.prototype.parseData = function(message, remote) {
 
 			var macAddress = MessageHex.substr(MessageHex.indexOf('accf'), 12); // Look for the first occurance of ACCF (the start of our MAC address) and grab it, plus the next 12 bytes
 			var type; // A human-readable version of what message we've received
+      
 
 			index = hosts.map(function(e) { return e.macaddress; }).indexOf(macAddress); // Use the arr.map() and indexOf functions to find out where in our array, our AllOne is
       console.log("CID: " + MessageHex.substr(8,4));
@@ -372,7 +373,14 @@ OrviboAllOne.prototype.parseData = function(message, remote) {
                     break;
                 case "6469": // Possible button press, or just a ping thing?
                     c("Button pressed packet received for index: " + index, 4);
+
+                    if (buttonState == 1) {
+                      this.emit("buttonpressDown", index);
+                    }else {
+                      this.emit("buttonpressUp", index);
+                    }
                     this.emit("buttonpress", index);
+                    buttonState = (buttonState + 1)%2;
                     break;
                 case "7366": // Something has changed our socket state externally
                     c("External state change packet received", 4);
