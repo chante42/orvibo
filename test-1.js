@@ -1,7 +1,97 @@
+// -*- coding: utf8 -*-
+//
+//
+
+var PortHttp = 8080;
+
+
 var OrviboAllOne = require("./allone.js"); // Tell node.js we need to use this file. Store the file in the variable OrviboAllOne
 var o = new OrviboAllOne(); // Now we make a new copy of that file and store it in the variable called "o"
 var etat = 0;
 var myMessage="";
+
+var DEBUG_LEVEL = 4; // Level of verbosity we want. 9 = none, 1 = some, 2 = more, 3 = all
+var DEBUG_TO_FILE = false;
+
+var Blastername;
+var Perif;
+
+var fs    = require('fs'),
+nconf = require('nconf');
+
+  //
+  // Setup nconf to use (in-order):
+  //   3. A file located at 'path/to/config.json'
+  //
+nconf.file({ file: 'config.json' });
+
+var http = require("http");
+var url = require('url');
+var querystring = require('querystring');
+
+var http = require('http');
+
+
+var serverHttp = http.createServer();
+
+//
+//   request type : http://127.0.0.1:8080/{id orvibo}/{command}/{perif}/{blaster name}
+//
+serverHttp.on('request', function(req, res) {
+    
+    var page = url.parse(req.url).pathname;
+    
+    console.log(page);
+    order = page.toString().split('/');
+    c(order,4);
+
+
+    // verify only 2 subchaine in url
+    if ( typeof order[5] != 'undefined') {
+      res.writeHead(403, {'Content-Type': 'text/plain'});
+      res.end('too parameters');
+      return;
+    }
+
+    if ( typeof order[4] == 'undefined') {
+      res.writeHead(404, {'Content-Type': 'text/plain'});
+      res.end(' it lacks a parameter : name of blaster code <br><br> http://127.0.0.1:8080/{id orvibo}/{command}/{perif}/{blaster name}');
+      return;
+    }    
+
+    Blastername= order[4];
+    Perif = order[3];
+    var index =  parseInt(order[1]);
+
+    switch (order[2]) {
+      case 'learn' :
+        o.enterLearningMode(index);
+        c("learn"+Blastername,4);
+         res.end('learn');
+      break;
+      case 'blast' :
+      c("HTTP: blast ",4);
+        var myMessage=nconf.get(Perif+':'+Blastername);
+        o.emitIR(index, myMessage)
+        res.end('send');
+      break;
+      default:
+        c("HTTP: error :'"+order[1]+"'",4);
+
+        res.writeHead(405, {'Content-Type': 'text/plain'});
+        res.end('unknown function :'+order[1]+"'");
+    } // fin SWITCH order[0]
+
+    
+});
+
+serverHttp.listen(PortHttp);
+
+
+
+
+
+
 
 // This code is only executed when allone.js reports that it's ready. Think of this slab of code as an event
 o.on("ready", function() {
@@ -20,9 +110,9 @@ o.on('allonefound', function() {
 // When this code is executed, the OrviboAllOne file reports back and says WHICH AllOne has had the button pressed
 // So you can have as many AllOnes as you like, and control them individually
 o.on('buttonpressDown', function(index) {
-	console.log("OCH --->reçu buttonPressDown");
+	console.log("OCH --->reçu buttonPressDown : index='"+index+"'");
 	if ( etat == 0) {
-    	o.enterLearningMode(index);
+     	o.enterLearningMode(index);
     }
     else {
     	console.log("Message a envoyer :|"+myMessage+"|");
@@ -62,6 +152,17 @@ o.on('emitting', function(index, ir) {
 o.on("ircode", function(index, message) {
    console.log("IR code received: (index:" + index+")="+message); // Show us what we've received
    myMessage=message;
+
+  nconf.set(Perif+':'+Blastername, message);
+  //
+  // Save the configuration object to disk
+  //
+  nconf.save(function (err) {
+    fs.readFile('config.json', function (err, data) {
+      console.dir(JSON.parse(data))
+    });
+  });
+
 });
 
 //
@@ -70,3 +171,28 @@ o.on("messagereceived", function(message, remoteAddr) {
 });
 // This line prepares our OrviboAllOne file for network activity (binding ports etc.)
 o.prepare(); 
+
+
+
+
+
+
+
+
+//
+//        c
+//      Fonction de loggues
+//
+function c(msg, level) { // Shortcut for "console.log". Saves typing when debugging.
+
+    if(level >= DEBUG_LEVEL) {
+        var date = new Date();
+        var current_hour = date.getHours();
+        message = "==> OCH  (" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + ":" + date.getMilliseconds() + ": " + msg;
+        if(DEBUG_TO_FILE == false) {
+            console.log(message);
+        } else {
+            fs.appendFile("./allone-log.txt", message + "\n", function(err) { });
+        }
+    }
+}
