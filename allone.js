@@ -52,6 +52,7 @@ var e = new EventEmitter(); // For emitting events such as "power changed" etc.
 
 util.inherits(OrviboAllOne, EventEmitter); // We want to get all the benefits of EventEmitter, but in our own class. this means we can use this.emit("Derp");
 c("Options set up", 4);
+
 function OrviboAllOne() { // The main function in our module. AFAIK, this is akin to a class myClass { } thing in PHP
 	EventEmitter.call(this); // Needed so we can emit() from this module
 
