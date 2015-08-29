@@ -2,7 +2,7 @@
 //
 //
 
-var PortHttp = 8080;
+var PortHttp = 8081;
 
 
 var OrviboAllOne = require("./allone.js"); // Tell node.js we need to use this file. Store the file in the variable OrviboAllOne
@@ -72,8 +72,18 @@ serverHttp.on('request', function(req, res) {
       case 'blast' :
       c("HTTP: blast ",4);
         var myMessage=nconf.get(Perif+':'+Blastername);
-        o.emitIR(index, myMessage)
-        res.end('send');
+
+        if ('undefined' == typeof myMessage) {
+          console.log('unknown : '+page);
+          res.end('unknown : '+page);
+        }
+        else {
+          o.emitIR(index, myMessage);
+          res.end('send');
+        }
+      break;
+      case 'wakeup' :
+        o.discover(index);
       break;
       default:
         c("HTTP: error :'"+order[1]+"'",4);
