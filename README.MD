@@ -1,11 +1,13 @@
 Bonjour,
 
+INTRODUCTION : 
+--------------
 Ceci est une adaptation du code Grayada/index.js (https://gist.github.com/Grayda/b2ba0aa9e70fada5018e)
 et de la librairie ninja-allone (https://github.com/Grayda/ninja-allone)
 
 L'objectif est de pouvoir piloter les periphériques  infra rouge  par l'intermédiaire du boitier ORBIVO par S.A.R.A.H.
 
-j'ai donc modifier le code pour y inclure un serveur HTTP qui répond aux ordres de la forme :
+j'ai donc modifié le code pour y inclure un serveur HTTP qui répond aux ordres de la forme :
 
  http://127.0.0.1:8081/{id orvibo}/{command}/{perif}/{blaster name}
 
@@ -22,9 +24,18 @@ j'ai donc modifier le code pour y inclure un serveur HTTP qui répond aux ordres
   - blaster name : la fonction du code infrarouge
 
 
-EXEMPLES :
+PRINCIPE :
+----------
+  - Le boitier ORVIBO est très primitif (d'ou sont prix ~40€ )
+  - Il a donc aucune mémoire pour les codes infraRouge.
+  - Il est pilotable en UDP sur le port 5000, et suite a l'apprentissage d'une code renvois ce dernier sous forme hexa.
+  - Il suffit donc de l'enregister dans un fichier de config (config.json)
+  - et de renvoyer exactement ce même code pour qu'il soit réémis.
 
- pour enregister un code 
+
+EXEMPLES :
+----------
+ 0) configurez la partie réseau de  votre ORVIBO par l'intermédiare de l'application officiel
 
  1) lancer le serveur :
  	node.exe" server.js
@@ -34,7 +45,7 @@ EXEMPLES :
   http://127.0.0.1:8081/0/learn/tv/on
 
   l'OBVIBO se met a clignoter en rouge
-  Appuyer sur le bouton on de votre TV
+  Appuyer sur le bouton on de  la télécommande de votre TV
    
   Le code est enregistré.
 
