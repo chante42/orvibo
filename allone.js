@@ -245,12 +245,15 @@ OrviboAllOne.prototype.hosts = hosts; // Give the calling module access to the l
 
 OrviboAllOne.prototype.sendMessage = function(message, sHost, callback) { // The fun (?) part of our module. Sending of the messages!
     c("Send message function called", 4);
+
     message = new Buffer(message); // We need to send as a buffer. this line takes our message and makes it into one.
     process.nextTick(function() { // Next time we're processing stuff. To keep our app from running away from us, I suppose
 		scktClient.send(message, 0, message.length, port, sHost, function(err, bytes) { // Send the message. Parameter 2 is offset, so it's 0.
 	        if (err) throw err; // Error? CRASH AND BURN BB!
-	        c("Sent message. Error message (if present): " + err, 4);
-            this.emit("messageSent", message, sHost, scktServer.address().address); // Tell the world we've sent a packet. Include message, who it's being sent to, plus the address it's being sent from
+          if (err != null) {
+	         c("Sent message. Error message : '" + err+"'", 4);
+          }
+          this.emit("messageSent", message, sHost, scktServer.address().address); // Tell the world we've sent a packet. Include message, who it's being sent to, plus the address it's being sent from
 	    }.bind(this)); // Again, we do .bind(this) so calling this.emit(); comes from OrviboAllOne, and not from scktClient
 		if(typeof callback === "function") { c("Running Send message callback", 4); callback(); } // And if we've specified a callback function, go right ahead and do that, as we've sent the message
 	}.bind(this));

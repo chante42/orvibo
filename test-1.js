@@ -10,7 +10,7 @@ var o = new OrviboAllOne(); // Now we make a new copy of that file and store it 
 var etat = 0;
 var myMessage="";
 
-var DEBUG_LEVEL = 4; // Level of verbosity we want. 9 = none, 1 = some, 2 = more, 3 = all
+var DEBUG_LEVEL = 1; // Level of verbosity we want. 9 = none, 1 = some, 2 = more, 3 = all
 var DEBUG_TO_FILE = false;
 
 var Blastername;
@@ -53,7 +53,10 @@ serverHttp.on('request', function(req, res) {
       return;
     }
 
-    if ( typeof order[4] == 'undefined') {
+    command = new Buffer(order[2]).toString('ascii');
+    console.log("'"+command+"'");
+
+    if ( typeof order[4] == 'undefined' && command !== "list"  && command !== "wakeup")  {
       res.writeHead(404, {'Content-Type': 'text/plain'});
       res.end(' it lacks a parameter : name of blaster code <br><br> http://127.0.0.1:8080/{id orvibo}/{command}/{perif}/{blaster name}');
       return;
@@ -63,7 +66,11 @@ serverHttp.on('request', function(req, res) {
     Perif = order[3];
     var index =  parseInt(order[1]);
 
-    switch (order[2]) {
+    switch (command) {
+      case 'list':
+        c("list");
+        res.end("liste des codes....")
+      break;
       case 'learn' :
         o.enterLearningMode(index);
         c("learn"+Blastername,4);

@@ -12,5 +12,12 @@ et de la librairie ninja-allone (https://github.com/Grayda/ninja-allone)
    Le code envoyé par le allone est le même pour button down et up.
    ->Mise en place dans la lib une varaiable a état 
    -> Creation d'un evenement buttonPressedUp et buttonPressDown
-   
 
+
+TODO :
+  Enregistrer chaque code dans un fichier json de la forme
+   { "device" :"",
+   "name" :"",
+   "description":"",
+   "cordeIRHex":""
+   }
