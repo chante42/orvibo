@@ -54,11 +54,10 @@ serverHttp.on('request', function(req, res) {
     }
 
     command = new Buffer(order[2]).toString('ascii');
-    console.log("'"+command+"'");
-
+    
     if ( typeof order[4] == 'undefined' && command !== "list"  && command !== "wakeup" && command!== "help")  {
       res.writeHead(404, {'Content-Type': 'text/plain'});
-      res.end(' it lacks a parameter : name of blaster code <br><br> http://127.0.0.1:8080/{id orvibo}/{command}/{perif}/{blaster name}');
+      res.end(' it lacks a parameter : name of blaster code <br><br> http://127.0.0.1:'+PortHttp+'/{id orvibo}/{command}/{perif}/{blaster name}');
       return;
     }    
 
@@ -90,8 +89,13 @@ serverHttp.on('request', function(req, res) {
         }
       break;
       case 'wakeup' :
-        o.discover(index);
+        o.setState(index, true);
+        o.subscribe();
         res.end('wakeup');
+      break;
+
+      case 'help' :
+           res.end('help');
       break;
       default:
         c("HTTP: error :'"+order[1]+"'",4);
@@ -149,8 +153,7 @@ o.on('buttonpress', function(index) {
 // This code is run when we've asked our code to subscribe to an AllOne so we can control it, and 
 // the AllOne has responded to confirm we're subscribed. After you get to this step, you can start controlling!
 o.on('subscribed', function(index) { 
-	console.log("OCH --->reçue susbscried");
-    console.dir(o.hosts); // This line simply writes to the console, all of the AllOnes that have been found so far
+	  console.dir(o.hosts); // This line simply writes to the console, all of the AllOnes that have been found so far
     o.query();  // This line queries the AllOne for it's name. We don't need to do this step, but it's nice to have.
     console.log("->>>>>>>>INDEX :"+index);
     o.emitIR(index, "ABCDEF123456"); // Once we've subscribed, this line sends out IR to the AllOne we just subscribed to.
