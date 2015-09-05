@@ -46,7 +46,7 @@ serverHttp.on('request', function(req, res) {
     c(order,4);
 
 
-    // verify only 2 subchaine in url
+    // verify only 5 subchaine in url
     if ( typeof order[5] != 'undefined') {
       res.writeHead(403, {'Content-Type': 'text/plain'});
       res.end('too parameters');
@@ -56,7 +56,7 @@ serverHttp.on('request', function(req, res) {
     command = new Buffer(order[2]).toString('ascii');
     console.log("'"+command+"'");
 
-    if ( typeof order[4] == 'undefined' && command !== "list"  && command !== "wakeup")  {
+    if ( typeof order[4] == 'undefined' && command !== "list"  && command !== "wakeup" && command!== "help")  {
       res.writeHead(404, {'Content-Type': 'text/plain'});
       res.end(' it lacks a parameter : name of blaster code <br><br> http://127.0.0.1:8080/{id orvibo}/{command}/{perif}/{blaster name}');
       return;
@@ -91,12 +91,13 @@ serverHttp.on('request', function(req, res) {
       break;
       case 'wakeup' :
         o.discover(index);
+        res.end('wakeup');
       break;
       default:
         c("HTTP: error :'"+order[1]+"'",4);
 
         res.writeHead(405, {'Content-Type': 'text/plain'});
-        res.end('unknown function :'+order[1]+"'");
+        res.end('unknown function :'+command+"'");
     } // fin SWITCH order[0]
 
     
@@ -112,14 +113,12 @@ serverHttp.listen(PortHttp);
 
 // This code is only executed when allone.js reports that it's ready. Think of this slab of code as an event
 o.on("ready", function() {
-	console.log("OCH --->reçue ready");
-	o.discover(); // When we're ready, tell our OrviboAllOne file to start looking or any AllOnes that it can find
+		o.discover(); // When we're ready, tell our OrviboAllOne file to start looking or any AllOnes that it can find
 });
 
 // Our OrviboAllOne file has found a new AllOne. We need to subscribe to it so we can control it
 o.on('allonefound', function() { 
-	console.log("OCH --->reçue alloneFound");
-	o.subscribe(); 
+	  o.subscribe(); 
 });
 
 // There is a button on top of the AllOne. It's the "reset" button, but a short press can be picked up by our code.
@@ -127,8 +126,7 @@ o.on('allonefound', function() {
 // When this code is executed, the OrviboAllOne file reports back and says WHICH AllOne has had the button pressed
 // So you can have as many AllOnes as you like, and control them individually
 o.on('buttonpressDown', function(index) {
-	console.log("OCH --->reçu buttonPressDown : index='"+index+"'");
-	if ( etat == 0) {
+		if ( etat == 0) {
      	o.enterLearningMode(index);
     }
     else {
@@ -140,13 +138,12 @@ o.on('buttonpressDown', function(index) {
 
 //
 o.on('buttonpressUp', function(index) {
-  console.log("OCH --->reçu buttonPressUp ^^^^^^^^^^^^^^");
+  
  }); 
 
 //
 o.on('buttonpress', function(index) {
-  console.log("OCH --->reçu buttonPress    -------------");
-  
+    
 });
 
 // This code is run when we've asked our code to subscribe to an AllOne so we can control it, and 
