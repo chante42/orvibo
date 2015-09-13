@@ -21,3 +21,10 @@ TODO :
    "description":"",
    "cordeIRHex":""
    }
+
+------------------------------
+-    20150913
+------------------------------
+* Amélioration de la prise de la reinitialisation de l'orbivo après une période de non utilisation
+* création du script go.cmd pour lancer sous Windows au boot
+
