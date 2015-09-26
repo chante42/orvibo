@@ -61,7 +61,7 @@ serverHttp.on('request', function(req, res) {
       command = new Buffer(order[2]).toString('ascii');
     }
     
-    if ( typeof order[4] == 'undefined' && command !== "list"  && command !== "wakeup" && command!== "help")  {
+    if ( typeof order[4] == 'undefined' && command !== "list" && command !== "listHTML"  && command !== "wakeup" && command!== "help")  {
         errorMessage(res);
         return;
     }    
@@ -72,12 +72,30 @@ serverHttp.on('request', function(req, res) {
 
     switch (command) {
       case 'list':
-        c("list");
-        res.end("liste des codes....")
+        c("list :");
+        var msg =  "";
+        var obj1 = nconf.get();
+
+        Object.keys(obj1).forEach( function(name1) {
+          var obj2 = nconf.get(name1);
+
+          Object.keys(obj2).forEach( function(name2) {
+            msg= msg + name1+':'+name2+'\n';
+          });
+        });
+        res.writeHead(405, {'Content-Type': 'text/plain'});
+        res.end(msg);
+      break;
+      case 'listHTML':
+        c("listHTML :");
+        var msg = listHTML();
+        res.writeHead(405, {'Content-Type': 'text/html charset=utf-8'});
+        res.end(msg);
       break;
       case 'learn' :
         o.enterLearningMode(index);
         c("learn"+Blastername,4);
+        res.writeHead(405, {'Content-Type': 'text/plain'});
          res.end('learn');
       break;
       case 'blast' :
@@ -202,11 +220,40 @@ o.prepare();
 //
 function errorMessage(res) {
     res.writeHead(404, {'Content-Type': 'text/plain'});
-    res.end(' it lacks a parameter : name of blaster code <br><br> http://127.0.0.1:'+PortHttp+'/{id orvibo}/{command}/{perif}/{blaster name}');
+    res.end(' it lacks a parameter : name of blaster code <br><br> http://127.0.0.1:'+PortHttp+'/{id orvibo}/{command}/{perif}/{blaster name} \n\n for html interface call http://127.0.0.1:'+PortHttp+'/0/listHTML');
 }
 
 
+//
+//
+//
+function listHTML() {
+         var msg =  "";
+        var obj1 = nconf.get();
 
+        msg=msg+'<html><head><title>Liste des périphériques connus</title><meta charset="UTF-8">';
+        msg = msg +'<style type="text/css">p.ident  {text-indent: 30px;  }  p { text-align: justify; margin-top:2px} </style> ';
+
+        msg = msg +'</head><body>';
+        msg = msg +'<h1>Liste des périphériques connus</h1>';
+
+        msg = msg + '<p>';
+        Object.keys(obj1).forEach( function(name1) {
+          var obj2 = nconf.get(name1);
+          msg = msg + name1;
+          
+          Object.keys(obj2).forEach( function(name2) {
+            msg = msg + '<p class="ident">';
+            msg= msg + '<a href="/0/blast/'+name1+'/'+name2+'">'+ name2+'</a><br>';
+            msg = msg + '</p>'; 
+          });
+         
+        });
+
+        msg = msg + '/<p>';
+        msg= msg +"</body></html>"
+  return (msg);
+}
 //
 //        c
 //      Fonction de loggues

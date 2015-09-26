@@ -1,4 +1,10 @@
 ------------------------------
+-    20150926
+------------------------------
+* correction du bug (arrêt du service) 
+ si les arguments passe en HTTP ne respecte pas la syntaxe attendue
+
+------------------------------
 -    20150823
 ------------------------------
 * Creation du depot  a partir du code de Grayada/index.js (https://gist.github.com/Grayda/b2ba0aa9e70fada5018e)

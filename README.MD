@@ -15,9 +15,14 @@ j'ai donc modifié le code pour y inclure un serveur HTTP qui répond aux ordres
   - id orvibo : toujours a zero si vous avez qu'un Orbivo (pas testé avec plusieurs car je n'en ai qu'un)
   
   - command :
-  	* learn : pour apprendre un code infrarouge
-  	* blast : pour emettre un code infrarouge
-  	* wakeup : pour reveiller l'orbivo car il s'endort rapidement
+  	* learn     : pour apprendre un code infrarouge
+  	* blast     : pour emettre un code infrarouge
+  	* wakeup    : pour reveiller l'orbivo car il s'endort rapidement
+    * list      : affiche la liste des periferiques
+    * listHtml  : affiche la liste des periferiques au format HTML
+    * help      : affiche l'aide
+
+
 
   - perif : le nom du périphérique
 
@@ -36,6 +41,9 @@ PRINCIPE :
 EXEMPLES :
 ----------
  0) configurez la partie réseau de  votre ORVIBO par l'intermédiare de l'application officiel
+
+ 0 Bis) Installer les modues : nconf, underscore, underscore.string
+    >npd.exe nconf
 
  1) lancer le serveur :
  	node.exe" server.js
