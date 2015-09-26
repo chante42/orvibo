@@ -48,17 +48,22 @@ serverHttp.on('request', function(req, res) {
 
     // verify only 5 subchaine in url
     if ( typeof order[5] != 'undefined') {
-      res.writeHead(403, {'Content-Type': 'text/plain'});
-      res.end('too parameters');
+      errorMessage(res);
       return;
     }
 
-    command = new Buffer(order[2]).toString('ascii');
+    if (typeof order[2] == 'undefined') {
+      errorMessage(res);
+      
+      return;
+    }
+    else {
+      command = new Buffer(order[2]).toString('ascii');
+    }
     
     if ( typeof order[4] == 'undefined' && command !== "list"  && command !== "wakeup" && command!== "help")  {
-      res.writeHead(404, {'Content-Type': 'text/plain'});
-      res.end(' it lacks a parameter : name of blaster code <br><br> http://127.0.0.1:'+PortHttp+'/{id orvibo}/{command}/{perif}/{blaster name}');
-      return;
+        errorMessage(res);
+        return;
     }    
 
     Blastername= order[4];
@@ -192,7 +197,13 @@ o.prepare();
 
 
 
-
+//
+//   errorMessage
+//
+function errorMessage(res) {
+    res.writeHead(404, {'Content-Type': 'text/plain'});
+    res.end(' it lacks a parameter : name of blaster code <br><br> http://127.0.0.1:'+PortHttp+'/{id orvibo}/{command}/{perif}/{blaster name}');
+}
 
 
 
