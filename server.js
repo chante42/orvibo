@@ -232,25 +232,33 @@ function listHTML() {
         var obj1 = nconf.get();
 
         msg=msg+'<html><head><title>Liste des périphériques connus</title><meta charset="UTF-8">';
-        msg = msg +'<style type="text/css">p.ident  {text-indent: 30px;  }  p { text-align: justify; margin-top:2px} </style> ';
+        msg = msg +'<style type="text/css">#telecommande{background:#e6e6e6;margin-left:20}';
+        msg = msg + '#periph{clear: both;}';
+        msg = msg + '.button{height: 15px;float: left; padding:10px; border: 5px solid grey;background-color: lightgrey;}';
+        msg = msg + '.button:hover, #boutton_free:hover{background: #525252;color:white;}';
+        msg = msg + '.button.no_hover:hover{background: initial;color:initial;}';
+        msg = msg + '.button.right{float:right;}';
+        msg = msg + '</style> ';
 
         msg = msg +'</head><body>';
-        msg = msg +'<h1>Liste des périphériques connus</h1>';
+        msg= msg + '<div id="telecommande"><div class="button"><a href="/0/wakeup/0/0">réveil orbivo</a></div>';
+        msg = msg +'</div>';
+        msg = msg +'<div id="periph"><h1>Liste des périphériques connus</h1></div>';
 
-        msg = msg + '<p>';
         Object.keys(obj1).forEach( function(name1) {
           var obj2 = nconf.get(name1);
-          msg = msg + name1;
-          
+          msg = msg + '<div id="periph"><h2>'+name1+'<h2></div>';
+          msg = msg + '<div id="telecommande">';
+                    
           Object.keys(obj2).forEach( function(name2) {
-            msg = msg + '<p class="ident">';
-            msg= msg + '<a href="/0/blast/'+name1+'/'+name2+'">'+ name2+'</a><br>';
-            msg = msg + '</p>'; 
+            msg = msg + '<div class="button">';
+            msg= msg + '<a href="/0/blast/'+name1+'/'+name2+'">'+ name2+'</a>';
+            msg = msg + '</div>'; 
           });
-         
+         msg = msg + '</div>';
         });
 
-        msg = msg + '/<p>';
+        
         msg= msg +"</body></html>"
   return (msg);
 }
