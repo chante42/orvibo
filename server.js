@@ -229,38 +229,49 @@ function errorMessage(res) {
 //
 function listHTML() {
          var msg =  "";
+         var msgh =  "";
         var obj1 = nconf.get();
 
-        msg=msg+'<html><head><title>Liste des périphériques connus</title><meta charset="UTF-8">';
-        msg = msg +'<style type="text/css">#telecommande{background:#e6e6e6;margin-left:20}';
-        msg = msg + '#periph{clear: both;}';
-        msg = msg + '.button{height: 15px;float: left; padding:10px; border: 5px solid grey;background-color: lightgrey;}';
-        msg = msg + '.button:hover, #boutton_free:hover{background: #525252;color:white;}';
-        msg = msg + '.button.no_hover:hover{background: initial;color:initial;}';
-        msg = msg + '.button.right{float:right;}';
-        msg = msg + '</style> ';
+        msgh =msgh+'<html><head><title>Liste des périphériques connus</title><meta charset="UTF-8">';
+        msgh = msgh +'<style type="text/css">#telecommande{background:#e6e6e6;margin-left:20}';
+        msgh = msgh + ".block {clear:left}"
+        msgh = msgh + '.periph{display: inline;clear: left; font-weight: bold; font-size:25px}';
+        msgh = msgh + '.res{display: inline;background-color: #00ff00;font-style: oblique;width: 100px;margin-left:10px}';
+        msgh = msgh + '.button{height: 15px;float: left; padding:10px; border: 5px solid grey;background-color: lightgrey;}';
+        msgh = msgh + '.button:hover, #boutton_free:hover{background: #525252;color:white;}';
+        msgh = msgh + '.button.no_hover:hover{background: initial;color:initial;}';
+        msgh = msgh + '.button.right{float:right;}';
+        msgh = msgh + '</style> ';
+        msgh = msgh + '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>';
+        msgh = msgh+ '<script type="text/javascript" language="javascript">$(document).ready(function() {';
 
-        msg = msg +'</head><body>';
-        msg= msg + '<div id="telecommande"><div class="button"><a href="/0/wakeup/0/0">réveil orbivo</a></div>';
+        
+        msg= msg + '<body><div id="telecommande"><div class="button" id="wakeup">réveil orvibo</div><div class="res" id="result-wakeup"></div>';
+        msgh= msgh + '$("#wakeup").click(function(event){$("#result-wakeup").load("/0/wakeup/0/0");;setTimeout(function(){ $("#result-wakeup").text("");  }, 2000);});\n';
+        
         msg = msg +'</div>';
-        msg = msg +'<div id="periph"><h1>Liste des périphériques connus</h1></div>';
+        msg = msg +'<div class="block"><div class="periph"><h2>Liste des périphériques connus</h2></div></div>';
 
         Object.keys(obj1).forEach( function(name1) {
-          var obj2 = nconf.get(name1);
-          msg = msg + '<div id="periph"><h2>'+name1+'<h2></div>';
+          var obj2 = nconf.get(name1);  
+          msg = msg + '<div class="block"><div class="periph">'+name1+'</div><div class="res" id="result-'+name1+'"></div>';
           msg = msg + '<div id="telecommande">';
                     
           Object.keys(obj2).forEach( function(name2) {
-            msg = msg + '<div class="button">';
-            msg= msg + '<a href="/0/blast/'+name1+'/'+name2+'">'+ name2+'</a>';
+            msg = msg + '<div class="button" id="'+name1+'-'+name2+'">';
+            msg = msg + name2;
             msg = msg + '</div>'; 
+
+            msgh= msgh + '$("#'+name1+'-'+name2+'").click(function(event){$("#result-'+name1+'").load("/0/blast/'+name1+'/'+name2+'");setTimeout(function(){ $("#result-'+name1+'").text("");  }, 2000);});\n';
+
           });
-         msg = msg + '</div>';
+         msg = msg + '</div></div>';
         });
 
-        
-        msg= msg +"</body></html>"
-  return (msg);
+
+        msgh = msgh +'});</script></head>';
+        msg  = msg + '</body></html>';
+  return (msgh+msg);
 }
 //
 //        c
