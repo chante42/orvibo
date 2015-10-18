@@ -1,5 +1,9 @@
 Bonjour,
 
+INSTALLATION : 
+--------------
+npm install charset nconf undescore urlencode 
+
 INTRODUCTION : 
 --------------
 Ceci est une adaptation du code Grayada/index.js (https://gist.github.com/Grayda/b2ba0aa9e70fada5018e)
