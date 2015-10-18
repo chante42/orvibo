@@ -16,8 +16,9 @@ var DEBUG_TO_FILE = false;
 var Blastername;
 var Perif;
 
-var fs    = require('fs'),
-nconf = require('nconf');
+var fs    = require('fs');
+var nconf = require('nconf');
+var urlencode = require('urlencode');
 
   //
   // Setup nconf to use (in-order):
@@ -45,9 +46,10 @@ serverHttp.on('request', function(req, res) {
     order = page.toString().split('/');
     c(order,4);
 
-
+    
     // verify only 5 subchaine in url
     if ( typeof order[5] != 'undefined') {
+      console.log("to many arguments : "+ order[5]);
       errorMessage(res);
       return;
     }
@@ -66,8 +68,10 @@ serverHttp.on('request', function(req, res) {
         return;
     }    
 
-    Blastername= order[4];
-    Perif = order[3];
+    Blastername= urlencode.decode(order[4], 'utf8') ;
+    Perif = urlencode.decode(order[3], 'utf8');
+
+    console.log("perif="+Perif+" name="+Blastername);
     var index =  parseInt(order[1]);
 
     switch (command) {
@@ -118,7 +122,13 @@ serverHttp.on('request', function(req, res) {
       break;
 
       case 'help' :
-           res.end('help');
+           buf = fs.readFileSync("README.MD" ,{ encoding: 'utf8' });
+           res.end('help : \n'+ buf);
+      break;
+
+      case 'reload' :
+           nconf.file({ file: 'config.json' });
+           res.end('reload');
       break;
       default:
         c("HTTP: error :'"+order[1]+"'",4);
@@ -246,23 +256,32 @@ function listHTML() {
         msgh = msgh+ '<script type="text/javascript" language="javascript">$(document).ready(function() {';
 
         
-        msg= msg + '<body><div id="telecommande"><div class="button" id="wakeup">réveil orvibo</div><div class="res" id="result-wakeup"></div>';
-        msgh= msgh + '$("#wakeup").click(function(event){$("#result-wakeup").load("/0/wakeup/0/0");;setTimeout(function(){ $("#result-wakeup").text("");  }, 2000);});\n';
+        msg= msg + '<body><div id="telecommande">';
+        msg = msg + '<div class="button" id="wakeup">réveil orvibo</div>';
+        msgh= msgh + '$("#wakeup").click(function(event){$("#result-wakeup").load("/0/wakeup/0/0");setTimeout(function(){ $("#result-wakeup").text("");  }, 2000);});\n';
         
+        msg = msg + '<div class="button" id="reload">Recharge le fichier de conf</div><div class="res" id="result-wakeup"></div>';
+        msgh= msgh + '$("#reload").click(function(event){$("#result-wakeup").load("/0/reload/0/0");setTimeout(function(){ $("#result-weakup").text("");  }, 2000);});\n';
+        
+
         msg = msg +'</div>';
         msg = msg +'<div class="block"><div class="periph"><h2>Liste des périphériques connus</h2></div></div>';
 
         Object.keys(obj1).forEach( function(name1) {
           var obj2 = nconf.get(name1);  
-          msg = msg + '<div class="block"><div class="periph">'+name1+'</div><div class="res" id="result-'+name1+'"></div>';
+          var encodeName1 =encodeId(name1);
+          msg = msg + '<div class="block"><div class="periph">'+name1+'</div><div class="res" id="result-'+encodeName1+'"></div>';
           msg = msg + '<div id="telecommande">';
                     
           Object.keys(obj2).forEach( function(name2) {
-            msg = msg + '<div class="button" id="'+name1+'-'+name2+'">';
+            
+            var encodeName2 = encodeId(name2);
+
+            msg = msg + '<div class="button" id="'+encodeName1+'-'+encodeName2+'">';
             msg = msg + name2;
             msg = msg + '</div>'; 
 
-            msgh= msgh + '$("#'+name1+'-'+name2+'").click(function(event){$("#result-'+name1+'").load("/0/blast/'+name1+'/'+name2+'");setTimeout(function(){ $("#result-'+name1+'").text("");  }, 2000);});\n';
+            msgh= msgh + '$("#'+encodeName1+'-'+encodeName2+'").click(function(event){$("#result-'+encodeName1+'").load("/0/blast/'+urlencode(name1,'utf8')+'/'+urlencode(name2,'utf8')+'");setTimeout(function(){ $("#result-'+encodeName1+'").text("");  }, 2000);});\n';
 
           });
          msg = msg + '</div></div>';
@@ -273,6 +292,22 @@ function listHTML() {
         msg  = msg + '</body></html>';
   return (msgh+msg);
 }
+
+//
+//  encodeId
+//
+function encodeId(chaine){
+  var res;
+
+  res = chaine;
+  res = res.replace("+","plus");
+  res = res.replace("*","etoile");
+  res = res.replace("/","slash");
+  res = res.replace("%","pourcent");
+  res = res.replace(" ","_");
+  return(res);
+}
+
 //
 //        c
 //      Fonction de loggues
