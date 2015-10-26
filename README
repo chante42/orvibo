@@ -1,4 +1,10 @@
 ------------------------------
+-    20151018
+------------------------------
+* Mise ne place de l'encodage sur les URL 
+* Mise en place de l'encodage sur les ID des objets javascripts
+
+------------------------------
 -    20150926
 ------------------------------
 * correction du bug (arrêt du service) 
