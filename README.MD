@@ -2,7 +2,7 @@ Bonjour,
 
 INSTALLATION : 
 --------------
-npm install charset nconf undescore urlencode 
+npm install charset nconf undescore urlencode path
 
 INTRODUCTION : 
 --------------
@@ -23,7 +23,7 @@ j'ai donc modifié le code pour y inclure un serveur HTTP qui répond aux ordres
   	* blast     : pour emettre un code infrarouge
   	* wakeup    : pour reveiller l'orbivo car il s'endort rapidement
     * list      : affiche la liste des periferiques
-    * listHtml  : affiche la liste des periferiques au format HTML
+    * listHtml  : Mini interface HTML pour excecuter les actions.
     * help      : affiche l'aide
 
 
