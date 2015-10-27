@@ -292,6 +292,7 @@ function listHTML() {
          var msgh =  "";
          var msgSpy ="";
         var obj1 = nconf.get();
+        var messageHelp=fs.readFileSync('README.MD');
 
         msgh = msgh + '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>ORVIBO</title>\n';
         msgh = msgh + '<link rel="stylesheet" href="/0/html/bootstrap/css/bootstrap.min.css">\n';
@@ -300,6 +301,7 @@ function listHTML() {
         msgh = msgh + '<script src="/0/html/js/jquery.min.js"></script>\n ';
         msgh = msgh + '<script src="/0/html/bootstrap/js/bootstrap.min.js"></script>\n';
         msgh = msgh + '<script type="text/javascript" language="javascript">\n';
+        msgh = msgh + '       function toggler(divId) {$("#" + divId).toggle();} \n';
         msgh = msgh + '$(document).ready(function() {\n';
         msgh = msgh +'      $("ul.nav li a[href^=\'#\']").click(function(){\n';
         msgh = msgh +'         $("html, body").stop().animate({\n';
@@ -307,21 +309,23 @@ function listHTML() {
         msgh = msgh +'          }, 400);';
         msgh = msgh +'        });\n';
         
-
+ 
         msg = msg + '  <body data-spy="scroll" data-target="#myScrollspy">';
         msg = msg + '   <div class="container">';
         msg = msg + '    <div class="jumbotron">';
         msg = msg + '        <h1>Orvibo Control</h1>';
-        msg = msg + '        <img src="/0/html/img/orvibo-1.png">';
+        //msg = msg + '        <img src="/0/html/img/orvibo-1.png">';
         msg = msg + '                <div id="myButtons" class="bs-example">';
         msg = msg + '                  <form action="#" autocomplete="on">';
         msg = msg + '                     <button id="wakeup" type="button" class="btn btn-warning">réveil Orvino</button>';
         msg = msg + '                     <button id="reload" type="button" class="btn btn-warning">reload conf</button>';
+        msg = msg + '                     <button class="btn btn-warning" onclick="toggler(\'messageHelpcontenue\')" >Aide</button>\n';
         msg = msg + '                 </form>';
         msg = msg + '                </div>';
-        msg = msg + ' <div id="result-wakeup"></div>';
+        msg = msg + '         <div id="result-wakeup"></div>';
         
         msg = msg + '    </div>';
+        
         msg = msg + '    <div class="row">';
         msgSpy = msgSpy + '        <div class="col-xs-3" id="myScrollspy">';
         msgSpy = msgSpy + '            <ul class="nav nav-tabs nav-stacked affix-top" data-spy="affix" data-offset-top="125">';
@@ -331,7 +335,7 @@ function listHTML() {
         
 
         msg2 = msg2 + '    <div class="col-xs-9">';
-            
+        msg2 = msg2 + '    <div hidden="hidden" id="messageHelpcontenue"><pre class="bg-info">'+messageHelp+'</pre></div>';    
         var activeButton =' class="active" ';
         Object.keys(obj1).forEach( function(name1) {
           var obj2 = nconf.get(name1);  
