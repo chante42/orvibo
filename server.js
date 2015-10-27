@@ -2,7 +2,7 @@
 //
 //
 
-var PortHttp = 8081;
+var PortHttp = 8082;
 
 
 var OrviboAllOne = require("./allone.js"); // Tell node.js we need to use this file. Store the file in the variable OrviboAllOne
@@ -10,7 +10,7 @@ var o = new OrviboAllOne(); // Now we make a new copy of that file and store it 
 var etat = 0;
 var myMessage="";
 
-var DEBUG_LEVEL = 1; // Level of verbosity we want. 9 = none, 1 = some, 2 = more, 3 = all
+var DEBUG_LEVEL = 9; // Level of verbosity we want. 9 = none, 1 = some, 2 = more, 3 = all
 var DEBUG_TO_FILE = false;
 
 var Blastername;
@@ -34,7 +34,7 @@ var http = require('http');
 
 
 var serverHttp = http.createServer();
-c("interface Web : http:127.0.0.1:"+PortHttp, 1);
+c("interface Web : http:127.0.0.1:"+PortHttp, 9);
 serverHttp.listen(PortHttp);
 
 //
@@ -258,7 +258,213 @@ function html(fileName, res) {
   var defaultFileName = "/html/index.html";
   
   var headers = {};
-  var contentTypesByExtension = {
+  
+  console.log("HTML:1:"+fileName);
+   // If no file name in Url, use default file name
+  fileName = (fileName == "/html/") ? defaultFileName : rootFolder + fileName;
+  console.log("HTML:2:"+fileName);
+
+    fs.readFile(__dirname + decodeURIComponent(fileName), 'binary',function(err, content){
+        if (content != null && content != '' ){
+            
+            var contentType = ContentTypesByExtension[path.extname(fileName)];
+            if (contentType) headers["Content-Type"] = contentType;
+            console.log("HTML:3:"+contentType+':path:'+path.extname(fileName));                
+            headers["Content-Length"] = content.length;
+            res.writeHead(200, headers);
+            res.write(content);
+        }
+        else {
+          res.writeHead(404);
+          res.write("<h1>Page not Found</h1>");
+        }
+        res.end();
+    });
+
+}
+
+//
+//
+//
+function listHTML() {
+         var msg =  "";
+         var msg2 =  "";
+         var msgh =  "";
+         var msgSpy ="";
+        var obj1 = nconf.get();
+
+        msgh = msgh + '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>ORVIBO</title>\n';
+        msgh = msgh + '<link rel="stylesheet" href="/0/html/bootstrap/css/bootstrap.min.css">\n';
+        msgh = msgh + '<link rel="stylesheet" href="/0/html/bootstrap/css/bootstrap-theme.min.css">\n';
+        msgh = msgh + '<link rel="stylesheet" href="/0/html/css/orvibo.css">\n';
+        msgh = msgh + '<script src="/0/html/js/jquery.min.js"></script>\n ';
+        msgh = msgh + '<script src="/0/html/bootstrap/js/bootstrap.min.js"></script>\n';
+        msgh = msgh + '<script type="text/javascript" language="javascript">\n';
+        msgh = msgh + '$(document).ready(function() {\n';
+        msgh = msgh +'      $("ul.nav li a[href^=\'#\']").click(function(){\n';
+        msgh = msgh +'         $("html, body").stop().animate({\n';
+        msgh = msgh +'              scrollTop: $($(this).attr("href")).offset().top\n';
+        msgh = msgh +'          }, 400);';
+        msgh = msgh +'        });\n';
+        
+
+        msg = msg + '  <body data-spy="scroll" data-target="#myScrollspy">';
+        msg = msg + '   <div class="container">';
+        msg = msg + '    <div class="jumbotron">';
+        msg = msg + '        <h1>Orvibo Control</h1>';
+        msg = msg + '        <img src="/0/html/img/orvibo-1.png">';
+        msg = msg + '                <div id="myButtons" class="bs-example">';
+        msg = msg + '                  <form action="#" autocomplete="on">';
+        msg = msg + '                     <button id="wakeup" type="button" class="btn btn-warning">réveil Orvino</button>';
+        msg = msg + '                     <button id="reload" type="button" class="btn btn-warning">reload conf</button>';
+        msg = msg + '                 </form>';
+        msg = msg + '                </div>';
+        msg = msg + ' <div id="result-wakeup"></div>';
+        
+        msg = msg + '    </div>';
+        msg = msg + '    <div class="row">';
+        msgSpy = msgSpy + '        <div class="col-xs-3" id="myScrollspy">';
+        msgSpy = msgSpy + '            <ul class="nav nav-tabs nav-stacked affix-top" data-spy="affix" data-offset-top="125">';
+        msgSpy = msgSpy + '               <li><a href="#">top</a></li>'        
+        msgh= msgh + '$("button#wakeup").click(function(event){$("#result-wakeup").load("/0/wakeup/0/0");setTimeout(function(){ $("#result-wakeup").text("");  }, 2000);});\n';     
+        msgh= msgh + '$("button#reload").click(function(event){$("#result-wakeup").load("/0/reload/0/0");setTimeout(function(){ $("#result-wakeup").text("");  }, 2000);});\n';
+        
+
+        msg2 = msg2 + '    <div class="col-xs-9">';
+            
+        var activeButton =' class="active" ';
+        Object.keys(obj1).forEach( function(name1) {
+          var obj2 = nconf.get(name1);  
+          var encodeName1 =encodeId(name1);
+          msg2 = msg2 + '<h2 id="'+encodeName1+'">'+encodeName1+'<button class="result btn btn-success" id="result-'+encodeName1+'"></button></h2>';
+          msg2 = msg2 + '<p><div id="myButtons" class="bs-example">';
+          msgSpy = msgSpy + '                <li ';
+          msgSpy = msgSpy + activeButton +'><a href="#result-'+encodeName1+'">'+name1+'</a></li>';            
+          activeButton ='';
+          Object.keys(obj2).forEach( function(name2) {
+            
+            var encodeName2 = encodeId(name2);
+
+            msg2 = msg2 + '<button type="button" class="btn btn-primary" id="'+encodeName1+'-'+encodeName2+'">';
+            msg2 = msg2 + name2;
+            msg2 = msg2 + '</button>'; 
+
+            msgh= msgh + '$("button#'+encodeName1+'-'+encodeName2+'").click(function(event){$("#result-'+encodeName1+'").load("/0/blast/'+urlencode(name1,'utf8')+'/'+urlencode(name2,'utf8')+'");$("#result-'+encodeName1+'").css("display","inline");setTimeout(function(){  $("#result-'+encodeName1+'").css("display","none");$("#result-'+encodeName1+'").text(""); }, 2000);});\n';
+
+          });
+         msg2 = msg2 + '</div><p><hr>';
+        });
+
+        // fini de crer le spy de la droite 
+        msgSpy = msgSpy + '            </ul>';
+        msgSpy = msgSpy + '        </div>';
+
+        // fini le header
+        msgh = msgh +'});</script></head>';
+        
+        msg2 = msg2 + '</div></div></div>';
+        msg2  = msg2 + '</body></html>';
+  return (msgh+msg+msgSpy+msg2);
+}
+
+
+//
+//
+//
+function listHTML_ORIGINAL() {
+         var msg =  "";
+         var msgh =  "";
+        var obj1 = nconf.get();
+
+        msgh =msgh+'<html><head><title>Liste des périphériques connus</title><meta charset="UTF-8">';
+        msgh = msgh +'<style type="text/css">#telecommande{background:#e6e6e6;margin-left:20}';
+        msgh = msgh + ".block {clear:left}"
+        msgh = msgh + '.periph{display: inline;clear: left; font-weight: bold; font-size:25px}';
+        msgh = msgh + '.res{display: inline;background-color: #00ff00;font-style: oblique;width: 100px;margin-left:10px}';
+        msgh = msgh + '.button{height: 15px;float: left; padding:10px; border: 5px solid grey;background-color: lightgrey;}';
+        msgh = msgh + '.button:hover, #boutton_free:hover{background: #525252;color:white;}';
+        msgh = msgh + '.button.no_hover:hover{background: initial;color:initial;}';
+        msgh = msgh + '.button.right{float:right;}';
+        msgh = msgh + '</style> ';
+        msgh = msgh + '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>';
+        msgh = msgh+ '<script type="text/javascript" language="javascript">$(document).ready(function() {';
+
+        
+        msg= msg + '<body><div id="telecommande">';
+        msg = msg + '<div class="button" id="wakeup">réveil orvibo</div>';
+        msgh= msgh + '$("#wakeup").click(function(event){$("#result-wakeup").load("/0/wakeup/0/0");setTimeout(function(){ $("#result-wakeup").text("");  }, 2000);});\n';
+        
+        msg = msg + '<div class="button" id="reload">Recharge le fichier de conf</div><div class="res" id="result-wakeup"></div>';
+        msgh= msgh + '$("#reload").click(function(event){$("#result-wakeup").load("/0/reload/0/0");setTimeout(function(){ $("#result-weakup").text("");  }, 2000);});\n';
+        
+
+        msg = msg +'</div>';
+        msg = msg +'<div class="block"><div class="periph"><h2>Liste des périphériques connus</h2></div></div>';
+
+        Object.keys(obj1).forEach( function(name1) {
+          var obj2 = nconf.get(name1);  
+          var encodeName1 =encodeId(name1);
+          msg = msg + '<div class="block"><div class="periph">'+name1+'</div><div class="res" id="result-'+encodeName1+'"></div>';
+          msg = msg + '<div id="telecommande">';
+                    
+          Object.keys(obj2).forEach( function(name2) {
+            
+            var encodeName2 = encodeId(name2);
+
+            msg = msg + '<div class="button" id="'+encodeName1+'-'+encodeName2+'">';
+            msg = msg + name2;
+            msg = msg + '</div>'; 
+
+            msgh= msgh + '$("#'+encodeName1+'-'+encodeName2+'").click(function(event){$("#result-'+encodeName1+'").load("/0/blast/'+urlencode(name1,'utf8')+'/'+urlencode(name2,'utf8')+'");setTimeout(function(){ $("#result-'+encodeName1+'").text("");  }, 2000);});\n';
+
+          });
+         msg = msg + '</div></div>';
+        });
+
+
+        msgh = msgh +'});</script></head>';
+        msg  = msg + '</body></html>';
+  return (msgh+msg);
+}
+
+//
+//  encodeId
+//
+function encodeId(chaine){
+  var res;
+
+  res = chaine;
+  res = res.replace("+","plus");
+  res = res.replace("*","etoile");
+  res = res.replace("/","slash");
+  res = res.replace("%","pourcent");
+  res = res.replace(" ","_");
+  return(res);
+}
+
+//
+//        c
+//      Fonction de loggues
+//
+function c(msg, level) { // Shortcut for "console.log". Saves typing when debugging.
+
+    if(level >= DEBUG_LEVEL) {
+        var date = new Date();
+        var current_hour = date.getHours();
+        message = "==> OCH  (" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + ":" + date.getMilliseconds() + ": " + msg;
+        if(DEBUG_TO_FILE == false) {
+            console.log(message);
+        } else {
+            fs.appendFile("./allone-log.txt", message + "\n", function(err) { });
+        }
+    }
+}
+
+
+//
+// Definition des type de fichier en fonction de leur extension
+//
+var ContentTypesByExtension = {
         '.3gp'   : 'video/3gpp'
         , '.a'     : 'application/octet-stream'
         , '.ai'    : 'application/postscript'
@@ -425,236 +631,3 @@ function html(fileName, res) {
         , '.yml'   : 'text/yaml'
         , '.zip'   : 'application/zip'
   }; 
-
-  console.log("HTML:1:"+fileName);
-   // If no file name in Url, use default file name
-  fileName = (fileName == "/html/") ? defaultFileName : rootFolder + fileName;
-  console.log("HTML:2:"+fileName);
-
-    fs.readFile(__dirname + decodeURIComponent(fileName), 'binary',function(err, content){
-        if (content != null && content != '' ){
-            
-            var contentType = contentTypesByExtension[path.extname(fileName)];
-            if (contentType) headers["Content-Type"] = contentType;
-            console.log("HTML:3:"+contentType+':path:'+path.extname(fileName));                
-            headers["Content-Length"] = content.length;
-            res.writeHead(200, headers);
-            res.write(content);
-        }
-        res.end();
-    });
-
-}
-
-//
-//
-//
-function listHTML() {
-         var msg =  "";
-         var msg2 =  "";
-         var msgh =  "";
-         var msgSpy ="";
-        var obj1 = nconf.get();
-
-        msgh = msgh + '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>ORVIBO</title>';
-        msgh = msgh + '<link rel="stylesheet" href="/0/html/bootstrap/css/bootstrap.min.css"><link rel="stylesheet" href="/0/html/bootstrap/css/bootstrap-theme.min.css">';
-        msgh = msgh +'<script src="/0/html/js/jquery.min.js"></script> ';
-        msgh = msgh +'  <script src="/0/html/bootstrap/js/bootstrap.min.js"></script>';
-        msgh = msgh +'  <style type="text/css">';
-        msgh = msgh +'      /* Custom Styles */';
-        msgh = msgh +'      ul.nav-tabs { ';
-        msgh = msgh +'          width: 140px;';
-        msgh = msgh +'          margin-top: 20px;';
-        msgh = msgh +'          border-radius: 4px;';
-        msgh = msgh +'          border: 1px solid #ddd;';
-        msgh = msgh +'          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.067);';
-        msgh = msgh +'      }';
-        msgh = msgh +'      ul.nav-tabs li {';
-        msgh = msgh +'          margin: 0; ';
-        msgh = msgh +'          border-top: 1px solid #ddd;';
-        msgh = msgh +'      }';
-        msgh = msgh +'      ul.nav-tabs li:first-child {';
-        msgh = msgh +'          border-top: none;';
-        msgh = msgh +'      }';
-        msgh = msgh +'      ul.nav-tabs li a {';
-        msgh = msgh +'          margin: 0;';
-        msgh = msgh +'          padding: 8px 16px;';
-        msgh = msgh +'          border-radius: 0;';
-        msgh = msgh +'      }';
-        msgh = msgh +'      ul.nav-tabs li.active a, ul.nav-tabs li.active a:hover {';
-        msgh = msgh +'          color: #fff;';
-        msgh = msgh +'          background: #0088cc;';
-        msgh = msgh +'          border: 1px solid #0088cc;';
-        msgh = msgh +'      }';
-        msgh = msgh +'      ul.nav-tabs li:first-child a {';
-        msgh = msgh +'          border-radius: 4px 4px 0 0;';
-        msgh = msgh +'      }';
-        msgh = msgh +'      ul.nav-tabs li:last-child a {';
-        msgh = msgh +'          border-radius: 0 0 4px 4px;';
-        msgh = msgh +'      }';
-        msgh = msgh +'      ul.nav-tabs.affix {';
-        msgh = msgh +'          top: 30px; /* Set the top position of pinned element */';
-        msgh = msgh +'      }';
-        msgh = msgh +'      .jumbotron {';
-        msgh = msgh +'          padding-top: 10px;';
-        msgh = msgh +'          padding-bottom: 10px;';
-        msgh = msgh +'          margin-bottom: 10px;';
-        msgh = msgh +'      }';
-        msgh = msgh +'  </style>\n';
-        msgh = msgh+ '<script type="text/javascript" language="javascript">$(document).ready(function() {\n';
-        msgh = msgh +'      $("ul.nav li a[href^=\'#\']").click(function(){\n';
-        msgh = msgh +'         $("html, body").stop().animate({\n';
-        msgh = msgh +'              scrollTop: $($(this).attr("href")).offset().top\n';
-        msgh = msgh +'          }, 400);';
-        msgh = msgh +'        });\n';
-        
-        msg = msg + '  <body data-spy="scroll" data-target="#myScrollspy">';
-        msg = msg + '   <div class="container">';
-        msg = msg + '    <div class="jumbotron">';
-        msg = msg + '        <h1>Orbivo Control</h1>';
-        msg = msg + '                <div id="myButtons" class="bs-example">';
-        msg = msg + '                  <form action="#" autocomplete="on">';
-        msg = msg + '                     <button id="wakeup" type="button" class="btn btn-warning">réveil Orvino</button>';
-        msg = msg + '                     <button id="reload" type="button" class="btn btn-warning">reload conf</button>';
-        msg = msg + '                 </form>';
-        msg = msg + '                </div>';
-        msg = msg + ' <div id="result-wakeup"></div>';
-        
-        msg = msg + '    </div>';
-        msg = msg + '    <div class="row">';
-        msgSpy = msgSpy + '        <div class="col-xs-3" id="myScrollspy">';
-        msgSpy = msgSpy + '            <ul class="nav nav-tabs nav-stacked affix-top" data-spy="affix" data-offset-top="125">';
-        msgSpy = msgSpy + '               <li><a href="#">top</a></li>'        
-        msgh= msgh + '$("button#wakeup").click(function(event){$("#result-wakeup").load("/0/wakeup/0/0");console.log("wakeup");setTimeout(function(){ $("#result-wakeup").text("");  }, 2000);});\n';     
-        msgh= msgh + '$("button#reload").click(function(event){$("#result-wakeup").load("/0/reload/0/0");setTimeout(function(){ $("#result-weakup").text("");  }, 2000);});\n';
-        
-
-        msg2 = msg2 + '    <div class="col-xs-9">';
-            
-        var activeButton =' class="active" ';
-        Object.keys(obj1).forEach( function(name1) {
-          var obj2 = nconf.get(name1);  
-          var encodeName1 =encodeId(name1);
-          msg2 = msg2 + '<h2 id="'+encodeName1+'">'+encodeName1+'</h2><div id="result-'+encodeName1+'"></div>';
-          msg2 = msg2 + '<p><div id="myButtons" class="bs-example">';
-          msgSpy = msgSpy + '                <li ';
-          msgSpy = msgSpy + activeButton +'><a href="#result-'+encodeName1+'">'+name1+'</a></li>';            
-          activeButton ='';
-          Object.keys(obj2).forEach( function(name2) {
-            
-            var encodeName2 = encodeId(name2);
-
-            msg2 = msg2 + '<button type="button" class="btn btn-primary" id="'+encodeName1+'-'+encodeName2+'">';
-            msg2 = msg2 + name2;
-            msg2 = msg2 + '</button>'; 
-
-            msgh= msgh + '$("button#'+encodeName1+'-'+encodeName2+'").click(function(event){$("#result-'+encodeName1+'").load("/0/blast/'+urlencode(name1,'utf8')+'/'+urlencode(name2,'utf8')+'");console.log("click: |'+encodeName2+'|");setTimeout(function(){ $("#result-'+encodeName1+'").text("");  }, 2000);});\n';
-
-          });
-         msg2 = msg2 + '</div><p><hr>';
-        });
-
-        // fini de crer le spy de la droite 
-        msgSpy = msgSpy + '            </ul>';
-        msgSpy = msgSpy + '        </div>';
-
-        // fini le header
-        msgh = msgh +'});</script></head>';
-        
-        msg2 = msg2 + '</div></div></div>';
-        msg2  = msg2 + '</body></html>';
-  return (msgh+msg+msgSpy+msg2);
-}
-
-
-//
-//
-//
-function listHTML_ORIGINAL() {
-         var msg =  "";
-         var msgh =  "";
-        var obj1 = nconf.get();
-
-        msgh =msgh+'<html><head><title>Liste des périphériques connus</title><meta charset="UTF-8">';
-        msgh = msgh +'<style type="text/css">#telecommande{background:#e6e6e6;margin-left:20}';
-        msgh = msgh + ".block {clear:left}"
-        msgh = msgh + '.periph{display: inline;clear: left; font-weight: bold; font-size:25px}';
-        msgh = msgh + '.res{display: inline;background-color: #00ff00;font-style: oblique;width: 100px;margin-left:10px}';
-        msgh = msgh + '.button{height: 15px;float: left; padding:10px; border: 5px solid grey;background-color: lightgrey;}';
-        msgh = msgh + '.button:hover, #boutton_free:hover{background: #525252;color:white;}';
-        msgh = msgh + '.button.no_hover:hover{background: initial;color:initial;}';
-        msgh = msgh + '.button.right{float:right;}';
-        msgh = msgh + '</style> ';
-        msgh = msgh + '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>';
-        msgh = msgh+ '<script type="text/javascript" language="javascript">$(document).ready(function() {';
-
-        
-        msg= msg + '<body><div id="telecommande">';
-        msg = msg + '<div class="button" id="wakeup">réveil orvibo</div>';
-        msgh= msgh + '$("#wakeup").click(function(event){$("#result-wakeup").load("/0/wakeup/0/0");setTimeout(function(){ $("#result-wakeup").text("");  }, 2000);});\n';
-        
-        msg = msg + '<div class="button" id="reload">Recharge le fichier de conf</div><div class="res" id="result-wakeup"></div>';
-        msgh= msgh + '$("#reload").click(function(event){$("#result-wakeup").load("/0/reload/0/0");setTimeout(function(){ $("#result-weakup").text("");  }, 2000);});\n';
-        
-
-        msg = msg +'</div>';
-        msg = msg +'<div class="block"><div class="periph"><h2>Liste des périphériques connus</h2></div></div>';
-
-        Object.keys(obj1).forEach( function(name1) {
-          var obj2 = nconf.get(name1);  
-          var encodeName1 =encodeId(name1);
-          msg = msg + '<div class="block"><div class="periph">'+name1+'</div><div class="res" id="result-'+encodeName1+'"></div>';
-          msg = msg + '<div id="telecommande">';
-                    
-          Object.keys(obj2).forEach( function(name2) {
-            
-            var encodeName2 = encodeId(name2);
-
-            msg = msg + '<div class="button" id="'+encodeName1+'-'+encodeName2+'">';
-            msg = msg + name2;
-            msg = msg + '</div>'; 
-
-            msgh= msgh + '$("#'+encodeName1+'-'+encodeName2+'").click(function(event){$("#result-'+encodeName1+'").load("/0/blast/'+urlencode(name1,'utf8')+'/'+urlencode(name2,'utf8')+'");setTimeout(function(){ $("#result-'+encodeName1+'").text("");  }, 2000);});\n';
-
-          });
-         msg = msg + '</div></div>';
-        });
-
-
-        msgh = msgh +'});</script></head>';
-        msg  = msg + '</body></html>';
-  return (msgh+msg);
-}
-
-//
-//  encodeId
-//
-function encodeId(chaine){
-  var res;
-
-  res = chaine;
-  res = res.replace("+","plus");
-  res = res.replace("*","etoile");
-  res = res.replace("/","slash");
-  res = res.replace("%","pourcent");
-  res = res.replace(" ","_");
-  return(res);
-}
-
-//
-//        c
-//      Fonction de loggues
-//
-function c(msg, level) { // Shortcut for "console.log". Saves typing when debugging.
-
-    if(level >= DEBUG_LEVEL) {
-        var date = new Date();
-        var current_hour = date.getHours();
-        message = "==> OCH  (" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + ":" + date.getMilliseconds() + ": " + msg;
-        if(DEBUG_TO_FILE == false) {
-            console.log(message);
-        } else {
-            fs.appendFile("./allone-log.txt", message + "\n", function(err) { });
-        }
-    }
-}

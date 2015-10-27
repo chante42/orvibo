@@ -26,8 +26,6 @@ j'ai donc modifié le code pour y inclure un serveur HTTP qui répond aux ordres
     * listHtml  : Mini interface HTML pour excecuter les actions.
     * help      : affiche l'aide
 
-
-
   - perif : le nom du périphérique
 
   - blaster name : la fonction du code infrarouge

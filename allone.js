@@ -27,7 +27,7 @@
   * emitted (index) - We've asked to emit some data, and we've had confirmation
 */
 
-var DEBUG_LEVEL = 4; // Level of verbosity we want. 9 = none, 1 = some, 2 = more, 3 = all
+var DEBUG_LEVEL = 9; // Level of verbosity we want. 9 = none, 1 = some, 2 = more, 3 = all
 var DEBUG_TO_FILE = false;
 
 var util = require("util"); // For inheriting the EventEmitter stuff so we can use it via this.emit();

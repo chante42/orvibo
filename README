@@ -1,4 +1,16 @@
 ------------------------------
+-    20151027
+------------------------------
+* réaménagement du code 
+* Mise en place d'un bouton de resultat sur l'appuie sur un bouton de commande
+* Renvois un 404 quand l'element applelé en HTTP ne répond pas
+
+------------------------------
+-    20151026
+------------------------------
+* Mise en place de l'interface en bootstrap
+
+------------------------------
 -    20151018
 ------------------------------
 * Mise ne place de l'encodage sur les URL 
