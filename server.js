@@ -34,7 +34,7 @@ var http = require('http');
 
 
 var serverHttp = http.createServer();
-c("interface Web : http:127.0.0.1:"+PortHttp, 9);
+c("interface Web : \n\t http://127.0.0.1:"+PortHttp+'\n\t http://IP:'+PortHttp, 9);
 serverHttp.listen(PortHttp);
 
 //
