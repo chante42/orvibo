@@ -34,7 +34,23 @@ var http = require('http');
 
 
 var serverHttp = http.createServer();
-c("interface Web : \n\t http://127.0.0.1:"+PortHttp+'\n\t http://IP:'+PortHttp, 9);
+c('Web Site :    http://'+getIPAddress()+':'+PortHttp+"/0/listHTML\n\n", 9);
+c('API :  http://'+getIPAddress()+':'+PortHttp+"/{id orvibo}/{command}/{perif}/{blaster name}\n\
+\n\
+ avec :\n\
+  - id orvibo : toujours a zero si vous avez qu'un Orbivo (pas testé avec plusieurs car je n'en ai qu'un)\n\
+  \n\
+  - command :\n\
+    * learn     : pour apprendre un code infrarouge\n\
+    * blast     : pour emettre un code infrarouge\n\
+    * wakeup    : pour reveiller l'orbivo car il s'endort rapidement\n\
+    * list      : affiche la liste des periferiques\n\
+    * listHtml  : Mini interface HTML pour excecuter les actions.\n\
+    * help      : affiche l'aide\n\
+\n\
+  - perif : le nom du périphérique\n\
+\n\
+  - blaster name : la fonction du code infrarouge\n", 9);
 serverHttp.listen(PortHttp);
 
 //
@@ -303,11 +319,12 @@ function listHTML() {
         msgh = msgh + '<script type="text/javascript" language="javascript">\n';
         msgh = msgh + '       function toggler(divId) {$("#" + divId).toggle();} \n';
         msgh = msgh + '$(document).ready(function() {\n';
-        msgh = msgh +'      $("ul.nav li a[href^=\'#\']").click(function(){\n';
-        msgh = msgh +'         $("html, body").stop().animate({\n';
-        msgh = msgh +'              scrollTop: $($(this).attr("href")).offset().top\n';
-        msgh = msgh +'          }, 400);';
-        msgh = msgh +'        });\n';
+        //msgh = msgh +'      $("ul.nav li a[href^=\'#\']").click(function(){\n';
+        //msgh = msgh +'         console.log("go:"+$(this).attr("href"))\n';  
+        //msgh = msgh +'         $("html, body").stop().animate({\n';
+        //msgh = msgh +'              scrollTop: $($(this).attr("href")).top\n';
+        //msgh = msgh +'          }, 400);';
+        //msgh = msgh +'        });\n';
         
  
         msg = msg + '  <body data-spy="scroll" data-target="#myScrollspy">';
@@ -331,7 +348,7 @@ function listHTML() {
         msgSpy = msgSpy + '            <ul class="nav nav-tabs nav-stacked affix-top" data-spy="affix" data-offset-top="125">';
         msgSpy = msgSpy + '               <li><a href="#">top</a></li>'        
         msgh= msgh + '$("button#wakeup").click(function(event){$("#result-wakeup").load("/0/wakeup/0/0");setTimeout(function(){ $("#result-wakeup").text("");  }, 2000);});\n';     
-        msgh= msgh + '$("button#reload").click(function(event){$("#result-wakeup").load("/0/reload/0/0");setTimeout(function(){ $("#result-wakeup").text("");  }, 2000);});\n';
+        msgh= msgh + '$("button#reload").click(function(event){location.reload(true);$("#result-wakeup").load("/0/reload/0/0");setTimeout(function(){ $("#result-wakeup").text("");  }, 2000);});\n';
         
 
         msg2 = msg2 + '    <div class="col-xs-9">';
@@ -343,7 +360,7 @@ function listHTML() {
           msg2 = msg2 + '<h2 id="'+encodeName1+'">'+encodeName1+'<button class="result btn btn-success" id="result-'+encodeName1+'"></button></h2>';
           msg2 = msg2 + '<p><div id="myButtons" class="bs-example">';
           msgSpy = msgSpy + '                <li ';
-          msgSpy = msgSpy + activeButton +'><a href="#result-'+encodeName1+'">'+name1+'</a></li>';            
+          msgSpy = msgSpy + activeButton +'><a href="#'+encodeName1+'">'+name1+'</a></li>';            
           activeButton ='';
           Object.keys(obj2).forEach( function(name2) {
             
@@ -372,64 +389,6 @@ function listHTML() {
 }
 
 
-//
-//
-//
-function listHTML_ORIGINAL() {
-         var msg =  "";
-         var msgh =  "";
-        var obj1 = nconf.get();
-
-        msgh =msgh+'<html><head><title>Liste des périphériques connus</title><meta charset="UTF-8">';
-        msgh = msgh +'<style type="text/css">#telecommande{background:#e6e6e6;margin-left:20}';
-        msgh = msgh + ".block {clear:left}"
-        msgh = msgh + '.periph{display: inline;clear: left; font-weight: bold; font-size:25px}';
-        msgh = msgh + '.res{display: inline;background-color: #00ff00;font-style: oblique;width: 100px;margin-left:10px}';
-        msgh = msgh + '.button{height: 15px;float: left; padding:10px; border: 5px solid grey;background-color: lightgrey;}';
-        msgh = msgh + '.button:hover, #boutton_free:hover{background: #525252;color:white;}';
-        msgh = msgh + '.button.no_hover:hover{background: initial;color:initial;}';
-        msgh = msgh + '.button.right{float:right;}';
-        msgh = msgh + '</style> ';
-        msgh = msgh + '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>';
-        msgh = msgh+ '<script type="text/javascript" language="javascript">$(document).ready(function() {';
-
-        
-        msg= msg + '<body><div id="telecommande">';
-        msg = msg + '<div class="button" id="wakeup">réveil orvibo</div>';
-        msgh= msgh + '$("#wakeup").click(function(event){$("#result-wakeup").load("/0/wakeup/0/0");setTimeout(function(){ $("#result-wakeup").text("");  }, 2000);});\n';
-        
-        msg = msg + '<div class="button" id="reload">Recharge le fichier de conf</div><div class="res" id="result-wakeup"></div>';
-        msgh= msgh + '$("#reload").click(function(event){$("#result-wakeup").load("/0/reload/0/0");setTimeout(function(){ $("#result-weakup").text("");  }, 2000);});\n';
-        
-
-        msg = msg +'</div>';
-        msg = msg +'<div class="block"><div class="periph"><h2>Liste des périphériques connus</h2></div></div>';
-
-        Object.keys(obj1).forEach( function(name1) {
-          var obj2 = nconf.get(name1);  
-          var encodeName1 =encodeId(name1);
-          msg = msg + '<div class="block"><div class="periph">'+name1+'</div><div class="res" id="result-'+encodeName1+'"></div>';
-          msg = msg + '<div id="telecommande">';
-                    
-          Object.keys(obj2).forEach( function(name2) {
-            
-            var encodeName2 = encodeId(name2);
-
-            msg = msg + '<div class="button" id="'+encodeName1+'-'+encodeName2+'">';
-            msg = msg + name2;
-            msg = msg + '</div>'; 
-
-            msgh= msgh + '$("#'+encodeName1+'-'+encodeName2+'").click(function(event){$("#result-'+encodeName1+'").load("/0/blast/'+urlencode(name1,'utf8')+'/'+urlencode(name2,'utf8')+'");setTimeout(function(){ $("#result-'+encodeName1+'").text("");  }, 2000);});\n';
-
-          });
-         msg = msg + '</div></div>';
-        });
-
-
-        msgh = msgh +'});</script></head>';
-        msg  = msg + '</body></html>';
-  return (msgh+msg);
-}
 
 //
 //  encodeId
@@ -455,7 +414,7 @@ function c(msg, level) { // Shortcut for "console.log". Saves typing when debugg
     if(level >= DEBUG_LEVEL) {
         var date = new Date();
         var current_hour = date.getHours();
-        message = "==> OCH  (" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + ":" + date.getMilliseconds() + ": " + msg;
+        message = "==> (" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + ")" + ": " + msg;
         if(DEBUG_TO_FILE == false) {
             console.log(message);
         } else {
@@ -635,3 +594,24 @@ var ContentTypesByExtension = {
         , '.yml'   : 'text/yaml'
         , '.zip'   : 'application/zip'
   }; 
+
+//
+//       getIPAddress
+//
+function getIPAddress() { // A bit of code that lets us get our network IP address
+    var os = require('os')
+
+  var interfaces = os.networkInterfaces(); // Get a list of interfaces
+  
+  for (k in interfaces) { // Loop through our interfaces
+      for (k2 in interfaces[k]) { // And our sub-interfaces
+          var address = interfaces[k][k2]; // Get the address
+          if (address.family == 'IPv4' && !address.internal) { // If we're IPv4 and it's not an internal address (like 127.0.0.1)
+              
+                return address.address;
+          }
+      }
+  }
+
+  return "";
+}
