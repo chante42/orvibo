@@ -1,8 +1,14 @@
 Bonjour,
 
+PRES-REQUIS :
+-------------
+Installer l'application ORVIBO sur votre téléphone et paramètrer le wifi de votre périphérique. (cf doc constructeur)
+
 INSTALLATION : 
 --------------
-npm install charset nconf undescore urlencode path
+Dans le repertoire ou vous avez cloner le repository github :
+Installer les dépendance javascript :
+  > npm install charset nconf undescore underscore.string urlencode path
 
 INTRODUCTION : 
 --------------
