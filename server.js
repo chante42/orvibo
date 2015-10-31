@@ -317,6 +317,7 @@ function listHTML() {
         msgh = msgh + '<link rel="stylesheet" href="/0/html/bootstrap/css/bootstrap.min.css">\n';
         msgh = msgh + '<link rel="stylesheet" href="/0/html/bootstrap/css/bootstrap-theme.min.css">\n';
         msgh = msgh + '<link rel="stylesheet" href="/0/html/css/orvibo.css">\n';
+        msgh = msgh + '<link rel="icon" type="image/png" href="/0/html/img/orvibo-1.png" />\n';
         msgh = msgh + '<script src="/0/html/js/jquery.min.js"></script>\n ';
         msgh = msgh + '<script src="/0/html/bootstrap/js/bootstrap.min.js"></script>\n';
         msgh = msgh + '<script type="text/javascript" language="javascript">\n';
