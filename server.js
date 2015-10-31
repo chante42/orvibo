@@ -281,6 +281,7 @@ function html(fileName, res) {
   console.log("HTML:2:"+fileName);
 
     fs.readFile(__dirname + decodeURIComponent(fileName), 'binary',function(err, content){
+        console.dir(err);
         if (content != null && content != '' ){
             
             var contentType = ContentTypesByExtension[path.extname(fileName)];
@@ -288,13 +289,15 @@ function html(fileName, res) {
             console.log("HTML:3:"+contentType+':path:'+path.extname(fileName));                
             headers["Content-Length"] = content.length;
             res.writeHead(200, headers);
-            res.write(content);
+            res.end(content, 'binary');
+            
+            
         }
         else {
           res.writeHead(404);
-          res.write("<h1>Page not Found</h1>");
+          res.end("<h1>Page not Found</h1>");
         }
-        res.end();
+        //res.end();
     });
 
 }
@@ -319,28 +322,36 @@ function listHTML() {
         msgh = msgh + '<script type="text/javascript" language="javascript">\n';
         msgh = msgh + '       function toggler(divId) {$("#" + divId).toggle();} \n';
         msgh = msgh + '$(document).ready(function() {\n';
-        //msgh = msgh +'      $("ul.nav li a[href^=\'#\']").click(function(){\n';
-        //msgh = msgh +'         console.log("go:"+$(this).attr("href"))\n';  
-        //msgh = msgh +'         $("html, body").stop().animate({\n';
-        //msgh = msgh +'              scrollTop: $($(this).attr("href")).top\n';
-        //msgh = msgh +'          }, 400);';
-        //msgh = msgh +'        });\n';
+        msgh = msgh +'      $("ul.nav li a[href^=\'#\']").click(function(){\n';
+        msgh = msgh +'         $("html, body").stop().animate({\n';
+        msgh = msgh +'              scrollTop: $($(this).attr("href")).top\n';
+        msgh = msgh +'          }, 400);';
+        msgh = msgh +'        });\n';
         
  
         msg = msg + '  <body data-spy="scroll" data-target="#myScrollspy">';
         msg = msg + '   <div class="container">';
         msg = msg + '    <div class="jumbotron">';
-        msg = msg + '        <h1>Orvibo Control</h1>';
-        //msg = msg + '        <img src="/0/html/img/orvibo-1.png">';
-        msg = msg + '                <div id="myButtons" class="bs-example">';
-        msg = msg + '                  <form action="#" autocomplete="on">';
+        msg = msg + '        <div class="row">'
+        msg = msg + '          <h1 class="col-md-10 col-sm-10">Orvibo Control</h1>';
+        msg = msg + '          <img class=" cold-md-2 col-sm-2"src="/0/html/img/orvibo-128x128.png" width="100" height="100">';
+        msg = msg + '        </div>';
+        msg = msg + '        <div class="row">'
+        msg = msg + '          <div id="myButtons" class="bs-example">';
+        msg = msg + '             <form action="#" autocomplete="on">';
+        msg = msg + '                <div class="row">';
+        msg = msg + '                   <div class="col-md-11 col-sm-11">';
         msg = msg + '                     <button id="wakeup" type="button" class="btn btn-warning">réveil Orvino</button>';
         msg = msg + '                     <button id="reload" type="button" class="btn btn-warning">reload conf</button>';
+        msg = msg + '                   </div>';
+        msg = msg + '                   <div class="col-md-1 col-sm-1">';
         msg = msg + '                     <button class="btn btn-warning" onclick="toggler(\'messageHelpcontenue\')" >Aide</button>\n';
-        msg = msg + '                 </form>';
+        msg = msg + '                   </div>';
         msg = msg + '                </div>';
-        msg = msg + '         <div id="result-wakeup"></div>';
-        
+        msg = msg + '             </form>';
+        msg = msg + '        </div>';
+        msg = msg + '        <div id="result-wakeup"></div>';
+        msg = msg + '       </div>'
         msg = msg + '    </div>';
         
         msg = msg + '    <div class="row">';
