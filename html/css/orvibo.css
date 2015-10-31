@@ -51,3 +51,5 @@ ul.nav-tabs.affix {
         margin-bottom: 10px;
         z-index: -999;
 }
+
+body {background-color:#fff;}
