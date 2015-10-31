@@ -2,7 +2,9 @@ Bonjour,
 
 PRES-REQUIS :
 -------------
-Installer l'application ORVIBO sur votre téléphone et paramètrer le wifi de votre périphérique. (cf doc constructeur)
+Installer l'application d'ORVIBO sur votre téléphone.
+ - WiWo (https://play.google.com/store/apps/details?id=com.orvibo.irhost&hl=fr)  
+ - Paramètrer le wifi de votre périphérique. (cf doc constructeur)
 
 INSTALLATION : 
 --------------
