@@ -82,13 +82,15 @@ OrviboAllOne.prototype.prepare = function(callback) { // Begin listening on our 
 		  });
 	   } else { // While node.js on Linux (Raspbian, but possibly other distros) will chuck the sads if we have a callback, even if the callback does absolutely nothing (possibly a bug)
            c("Binding client socket using Unix method", 4);
-           scktClient.bind(port);
-		  scktClient.setBroadcast(true); // If we don't do this, we can't send broadcast packets to x.x.x.255, so we can never discover our sockets!
+           scktClient.bind( function() {
+		          scktClient.setBroadcast(true); // If we don't do this, we can't send broadcast packets to x.x.x.255, so we can never discover our sockets!
+            });   
 	   }
 	   c("Binding server port", 4);
      c("localip|"+localIP+"|",4);
 	   scktServer.bind(port, localIP); // Listen on port 10000
-    
+
+
 	   this.emit("ready"); // TO-DO: Change this to something else, as it means we're bound, NOT that we're ready to turn the socket on and off. Potentially confusing!
     
 	   if(typeof callback === "function") { if(typeof callback === "function") { c("Running callback for ready method", 4); callback(); } }
